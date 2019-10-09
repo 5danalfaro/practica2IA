@@ -1,0 +1,33 @@
+c
+c File: toy10.clq
+c Claudio Rossi
+c
+c Largest Clique:  
+c
+p edge 8 23
+e 1 2
+e 1 3
+e 1 4
+e 1 6
+e 1 7
+e 1 8
+e 2 6
+e 2 4
+e 2 5
+e 2 7
+e 3 4
+e 3 6
+e 3 7
+e 3 8
+e 4 5
+e 4 6
+e 4 7
+e 4 8
+e 5 7
+e 5 8
+e 6 7
+e 6 7
+e 7 8
+
+
+
