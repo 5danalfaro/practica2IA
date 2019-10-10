@@ -7,6 +7,7 @@
 
  /*--- Forward declarations ---*/  
 void chrom2chessboard(Chrom_Ptr c, char tablero[MAXR][MAXR], int n);
+int obj_fun();
 
 // Variables globales
 int tipo;
@@ -19,17 +20,34 @@ char tablero[MAXR][MAXR];
 /*----------------------------------------------------------------------------
 | AÑADIR ESTAS INSTRUCCIONES EN EL MAIN
 ----------------------------------------------------------------------------*/
-   
-    
+
+main() 
+{
+   GA_Info_Ptr ga_info;
+   int i;
+
+   /*--- Initialize the genetic algorithm ---*/
+   ga_info = GA_config("GAconfig_ejemplo", obj_fun);
+
+
    tipo = ga_info->datatype;
    
    if(tipo==DT_BIT)
-     size = (int)sqrt(ga_info->chrom_len);
+      size = (int)sqrt(ga_info->chrom_len);
    else if(tipo==DT_INT_PERM)
       size =  (int)ga_info->chrom_len;
     else {printf("Something went wrong...%d\n",tipo);exit(-1);}
-     
-  
+
+
+   /*--- Run the GA ---*/
+   GA_run(ga_info);
+
+   printf("\nBest chrom:  ");
+   for(i=0;i<ga_info->chrom_len;i++)
+	     printf("%5.4f  ",ga_info->best->gene[i]);
+   
+   printf("   (fitness: %g)\n\n",ga_info->best->fitness);
+
 }
 
 
@@ -39,8 +57,29 @@ char tablero[MAXR][MAXR];
 | FUNCIONES
 ----------------------------------------------------------------------------*/
    
+/*----------------------------------------------------------------------------
+| obj_fun() - user specified objective function
+----------------------------------------------------------------------------*/
+int obj_fun(Chrom_Ptr chrom) 
+{
+  int i; 
+  double val = 0.0;
+  int amenazas;
 
-void chrom2chessboard(Chrom_Ptr c, char tablero[MAXR][MAXR], int n)
+  chrom2chessboard(chrom, tablero[MAXR][MAXR], size);
+  
+  amenazas = cuentaamenazas(tablero[MAXR][MAXR], size);
+  
+  chrom->fitness = size - 0.2 * amenazas;
+  
+  return 0;
+  
+}
+
+
+
+
+void chrom2chessboard(Chrom_Ptr c, char tablero[MAXR][MAXR], int size)
 {
   int i,j;
   
