@@ -28,7 +28,7 @@ int obj_fun(Chrom_Ptr chrom)
   int i, j; 
   double val = 0.0;
   int amenazas = 0;
-  int reinas[MAXR], sobran = 0, combinacion = 0;
+  int reinas[MAXR], sobran = 0, combinacion = 0, penaliza = 0, quitaese1 = 0;
 
   chrom2chessboard(chrom, tablero, size);
   
@@ -36,17 +36,25 @@ int obj_fun(Chrom_Ptr chrom)
   
   if(tipo==DT_BIT)
     {
-	for(i=0;i<size;i++)
+	for(i=0;i<size;i++){
 		for(j=0;j<size;j++){
-			if (tablero[i][j] == 1)
-				++reinas[i];
+			reinas[i] = tablero[i][j];}
+		if (reinas[i] > 1) penaliza = penaliza + reinas[i] - 1;
+		else if (reinas[i] == 0) penaliza = penaliza + 5;
+
+		if (tablero[i][size-1]==1) penaliza++;
+
 	}
 
-      
-	for(i=0;i<size;i++)
-		if (reinas[i] > 1) ++sobran;
+	
+	for(i = 0; i < chrom->length; i++)
+	{        
+	    val +=  chrom->gene[i];
+	}
 
-	chrom->fitness = size * 10 - 0.05 * amenazas + 10 * sobran; 
+	penaliza = penaliza + 1.2*abs(val - 10);
+
+	chrom->fitness = size*size - penaliza; // - amenazas; 
     }
   
 
@@ -177,7 +185,7 @@ int main()
    GA_Info_Ptr ga_info;
    int i, aux;
 
-   printf("Introduce tipo de dato (1: permutacion; otro: bit string)");
+   printf("Introduce tipo de dato (1: permutacion; otro: bit string): ");
    scanf("%d", &aux);
 
    if (aux == 1){
@@ -201,7 +209,7 @@ int main()
       size = (int)sqrt(ga_info->chrom_len);
    else if(tipo==DT_INT_PERM)
       size = (int)ga_info->chrom_len;
-   else {printf("Something went wrong...%d\n",tipo);exit(-1);}
+   else {printf("Something went wrong...%d\n",tipo); exit(-1);}
 
 
    /*--- Run the GA ---*/
