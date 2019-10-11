@@ -1,13 +1,14 @@
 /*============================================================================
 | INCULIR ESTAS INSTRUCCIONES AL PRINCIPIO DEL PROGRAMA
 ============================================================================*/
- 
+#include "ga.h" 
 
 #define MAXR 10
 
  /*--- Forward declarations ---*/  
 void chrom2chessboard(Chrom_Ptr c, char tablero[MAXR][MAXR], int n);
 int obj_fun();
+int cuentaamenazas(char tablero[MAXR][MAXR], int n);
 
 // Variables globales
 int tipo;
@@ -15,74 +16,60 @@ int size;
 char tablero[MAXR][MAXR];
 
 
-
-
-/*----------------------------------------------------------------------------
-| AÑADIR ESTAS INSTRUCCIONES EN EL MAIN
-----------------------------------------------------------------------------*/
-
-main() 
-{
-   GA_Info_Ptr ga_info;
-   int i;
-
-   /*--- Initialize the genetic algorithm ---*/
-   ga_info = GA_config("GAconfig_ejemplo", obj_fun);
-
-
-   tipo = ga_info->datatype;
-   
-   if(tipo==DT_BIT)
-      size = (int)sqrt(ga_info->chrom_len);
-   else if(tipo==DT_INT_PERM)
-      size =  (int)ga_info->chrom_len;
-    else {printf("Something went wrong...%d\n",tipo);exit(-1);}
-
-
-   /*--- Run the GA ---*/
-   GA_run(ga_info);
-
-   printf("\nBest chrom:  ");
-   for(i=0;i<ga_info->chrom_len;i++)
-	     printf("%5.4f  ",ga_info->best->gene[i]);
-   
-   printf("   (fitness: %g)\n\n",ga_info->best->fitness);
-
-}
-
-
-
-
 /*----------------------------------------------------------------------------
 | FUNCIONES
 ----------------------------------------------------------------------------*/
    
 /*----------------------------------------------------------------------------
-| obj_fun() - user specified objective function
+| obj_fun() - user specified objective function - FITNESS
 ----------------------------------------------------------------------------*/
 int obj_fun(Chrom_Ptr chrom) 
 {
-  int i; 
+  int i, j; 
   double val = 0.0;
-  int amenazas;
+  int amenazas = 0;
+  int reinas[MAXR], sobran = 0;
 
-  chrom2chessboard(chrom, tablero[MAXR][MAXR], size);
+  chrom2chessboard(chrom, tablero, size);
   
-  amenazas = cuentaamenazas(tablero[MAXR][MAXR], size);
+  amenazas = cuentaamenazas(tablero, size);
   
-  chrom->fitness = size - 0.2 * amenazas;
+  if(tipo==DT_BIT)
+    {
+	for(i=0;i<size;i++)
+		for(j=0;j<size;j++){
+			if (tablero[i][j] == 1)
+				++reinas[i];
+	}
+
+      
+	for(i=0;i<size;i++)
+		if (reinas[i] > 1) ++sobran;
+
+	chrom->fitness = size*10 - 0.05 * amenazas - 0.1 * sobran; 
+    }
+  
+
+  else if(tipo==DT_INT_PERM)
+    {
+	chrom->fitness = size*10 - 10 * amenazas; 
+    }
+
+  else printf("Te eta equivocando chico\n");
+
   
   return 0;
   
 }
 
-
-
+/*----------------------------------------------------------------------------
+| Funciones proporcionadas
+----------------------------------------------------------------------------*/
 
 void chrom2chessboard(Chrom_Ptr c, char tablero[MAXR][MAXR], int size)
 {
   int i,j;
-  
+
   if(tipo==DT_BIT)
     {
       for(i=0;i<size;i++)
@@ -99,12 +86,12 @@ void chrom2chessboard(Chrom_Ptr c, char tablero[MAXR][MAXR], int size)
 	  
 	for(i=0;i<size;i++)
 	  tablero[i][(int)c->gene[i]-1] = 1;
-
-	 
-
       }
+
     else printf("WTF???\n");
 }
+
+
    
 int cuentaamenazas(char tablero[MAXR][MAXR], int n)
 {
@@ -169,4 +156,44 @@ int cuentaamenazas(char tablero[MAXR][MAXR], int n)
 
   return amenazas;
 }
+
+
+
+/*----------------------------------------------------------------------------
+| MAIN
+----------------------------------------------------------------------------*/
+
+int main() 
+{
+   GA_Info_Ptr ga_info;
+   int i;
+
+   /*--- Initialize the genetic algorithm ---*/
+   ga_info = GA_config("GAconfig_ejemplo", obj_fun);
+
+ 
+   tipo = ga_info->datatype;
+   
+   if(tipo==DT_BIT)
+      size = (int)sqrt(ga_info->chrom_len);
+   else if(tipo==DT_INT_PERM)
+      size = (int)ga_info->chrom_len;
+   else {printf("Something went wrong...%d\n",tipo);exit(-1);}
+
+
+   /*--- Run the GA ---*/
+   GA_run(ga_info);
+
+
+   printf("\nBest chrom:  ");
+   for(i=0;i<ga_info->chrom_len;i++)
+	//if (i%10 == 0) printf("\n");	     
+	printf("%5.4f  ",ga_info->best->gene[i]);
+   
+   printf("   (fitness: %g)\n\n",ga_info->best->fitness);
+
+   return 0;
+
+}
+
 

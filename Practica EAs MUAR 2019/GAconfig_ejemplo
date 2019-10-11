@@ -36,9 +36,9 @@
 #
 # DEFAULT: int_perm
 #-----------------------------------------------------------------------------
-datatype bit
+# datatype bit
 # datatype int
-# datatype int_perm
+ datatype int_perm
 # datatype real
 
 #-----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ datatype bit
 #
 # DEFAULT: chrom_len 10
 #-----------------------------------------------------------------------------
-chrom_len 100
+chrom_len 10
 
 #-----------------------------------------------------------------------------
 # Pool size, needed when "initpool random" selected
@@ -200,9 +200,9 @@ stop_after 1000 use_convergence
 #
 # DEFAULT: crossover order1
 #-----------------------------------------------------------------------------
-crossover simple
+# crossover simple
 # crossover uniform
-# crossover order1            # use ony with integer permutations
+ crossover order1            # use ony with integer permutations
 # crossover order2            # use ony with integer permutations
 # crossover position          # use ony with integer permutations
 # crossover cycle             # use ony with integer permutations
@@ -234,13 +234,13 @@ x_rate 0.7
 #
 # DEFAULT: mutation swap
 #-----------------------------------------------------------------------------
-mutation simple_invert      # use only with bits
+# mutation simple_invert      # use only with bits
 # mutation simple_random      # use only with bits
-# mutation swap               # use with any datatype
+ mutation swap               # use with any datatype
 # mutation float_random 
 # mutation float_rnd_pert
 # mutation float_gauss_pert
-#mutation float_LS 
+# mutation float_LS 
 
 # rnd float in [0..1] -- introduced by claudio 10/02/2004
 
