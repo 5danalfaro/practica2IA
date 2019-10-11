@@ -28,7 +28,7 @@ int obj_fun(Chrom_Ptr chrom)
   int i, j; 
   double val = 0.0;
   int amenazas = 0;
-  int reinas[MAXR], sobran = 0;
+  int reinas[MAXR], sobran = 0, combinacion = 0;
 
   chrom2chessboard(chrom, tablero, size);
   
@@ -46,13 +46,22 @@ int obj_fun(Chrom_Ptr chrom)
 	for(i=0;i<size;i++)
 		if (reinas[i] > 1) ++sobran;
 
-	chrom->fitness = size*10 - 0.05 * amenazas - 0.1 * sobran; 
+	chrom->fitness = size * 10 - 0.05 * amenazas + 10 * sobran; 
     }
   
 
   else if(tipo==DT_INT_PERM)
     {
-	chrom->fitness = size*10 - 10 * amenazas; 
+	chrom->fitness = size - amenazas;
+	
+	/*
+	if (chrom->fitness == 10){
+		for (j=0; j<size; ++j){
+			chrom->gene[j] = j+1;
+		}		
+		++combinacion;	
+	}
+ 	*/
     }
 
   else printf("Te eta equivocando chico\n");
@@ -166,10 +175,24 @@ int cuentaamenazas(char tablero[MAXR][MAXR], int n)
 int main() 
 {
    GA_Info_Ptr ga_info;
-   int i;
+   int i, aux;
+
+   printf("Introduce tipo de dato (1: permutacion; otro: bit string)");
+   scanf("%d", &aux);
+
+   if (aux == 1){
 
    /*--- Initialize the genetic algorithm ---*/
-   ga_info = GA_config("GAconfig_ejemplo", obj_fun);
+   ga_info = GA_config("GAconfig_permut", obj_fun);
+
+   }
+
+   else {
+
+   /*--- Initialize the genetic algorithm ---*/
+   ga_info = GA_config("GAconfig_bit", obj_fun);
+
+   }
 
  
    tipo = ga_info->datatype;
@@ -185,10 +208,10 @@ int main()
    GA_run(ga_info);
 
 
-   printf("\nBest chrom:  ");
+   printf("\nBest chrom:  \n");
    for(i=0;i<ga_info->chrom_len;i++)
 	//if (i%10 == 0) printf("\n");	     
-	printf("%5.4f  ",ga_info->best->gene[i]);
+	printf("%5.0f  ",ga_info->best->gene[i]);
    
    printf("   (fitness: %g)\n\n",ga_info->best->fitness);
 
