@@ -283,8 +283,8 @@ mu_rate 0.9
 #
 # DEFAULT: objective minimize
 #-----------------------------------------------------------------------------
-# objective minimize
- objective maximize
+ objective minimize
+# objective maximize
 
 #-----------------------------------------------------------------------------
 # Elitism

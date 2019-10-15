@@ -26,9 +26,11 @@ char tablero[MAXR][MAXR];
 int obj_fun(Chrom_Ptr chrom) 
 {
   int i, j; 
+  double amenazas = 0;
   double val = 0.0;
-  int amenazas = 0;
-  int reinas[MAXR], sobran = 0, combinacion = 0, penaliza = 0, quitaese1 = 0;
+  double penaliza = 0, premio = 0;
+  int reinas_filas[MAXR], reinas_columnas[MAXR];
+
 
   chrom2chessboard(chrom, tablero, size);
   
@@ -36,31 +38,49 @@ int obj_fun(Chrom_Ptr chrom)
   
   if(tipo==DT_BIT)
     {
-	for(i=0;i<size;i++){
-		for(j=0;j<size;j++){
-			reinas[i] = tablero[i][j];}
-		if (reinas[i] > 1) penaliza = penaliza + reinas[i] - 1;
-		else if (reinas[i] == 0) penaliza = penaliza + 5;
 
-		if (tablero[i][size-1]==1) penaliza++;
+      for(i=0;i<size;i++){
+            reinas_filas[i] = 0;
+            reinas_columnas[i] = 0;
+
+            for(j=0;j<size;j++){
+                reinas_filas[i] += tablero[i][j];
+                reinas_columnas[i] += tablero[j][i];
+            }
+
+            //printf("%d    %d \n", reinas_filas[i], reinas_columnas[i]);
+
+            if (reinas_filas[i] > 1) penaliza = penaliza + reinas_filas[i] - 1;
+            else if (reinas_filas[i] == 0) penaliza = penaliza + 1;
+            else premio += 1;
+
+            if (reinas_columnas[i] > 1) penaliza = penaliza + reinas_columnas[i] - 1;
+            else if (reinas_columnas[i] == 0) penaliza = penaliza + 1;
+            else premio += 1;
 
 	}
 
-	
+
 	for(i = 0; i < chrom->length; i++)
 	{        
 	    val +=  chrom->gene[i];
 	}
 
-	penaliza = penaliza + 1.2*abs(val - 10);
+        penaliza = penaliza + abs(val - 10);
 
-	chrom->fitness = size*size - penaliza; // - amenazas; 
+        if (val == 10) premio += 1;
+
+        //printf("%f    %d      %d \n", val, penaliza, amenazas);
+
+        //chrom->fitness = size*size + premio - penaliza - amenazas / 100;
+
+        chrom->fitness = 2*penaliza + amenazas - premio;
     }
   
 
   else if(tipo==DT_INT_PERM)
     {
-	chrom->fitness = size - amenazas;
+        chrom->fitness = size - amenazas;
 	
 	/*
 	if (chrom->fitness == 10){
@@ -70,10 +90,10 @@ int obj_fun(Chrom_Ptr chrom)
 		++combinacion;	
 	}
  	*/
+
     }
 
   else printf("Te eta equivocando chico\n");
-
   
   return 0;
   
@@ -218,7 +238,7 @@ int main()
 
    printf("\nBest chrom:  \n");
    for(i=0;i<ga_info->chrom_len;i++)
-	//if (i%10 == 0) printf("\n");	     
+	//if (i%10 == 0) {printf("\n");}	     
 	printf("%5.0f  ",ga_info->best->gene[i]);
    
    printf("   (fitness: %g)\n\n",ga_info->best->fitness);
