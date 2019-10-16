@@ -66,13 +66,9 @@ int obj_fun(Chrom_Ptr chrom)
 	    val +=  chrom->gene[i];
 	}
 
-        penaliza = penaliza + abs(val - 10);
+        penaliza = penaliza + abs(val - size);
 
-        if (val == 10) premio += 1;
-
-        //printf("%f    %d      %d \n", val, penaliza, amenazas);
-
-        //chrom->fitness = size*size + premio - penaliza - amenazas / 100;
+        if (val == size) premio += 1;
 
         chrom->fitness = 2*penaliza + amenazas - premio;
     }
@@ -82,15 +78,6 @@ int obj_fun(Chrom_Ptr chrom)
     {
         chrom->fitness = size - amenazas;
 	
-	/*
-	if (chrom->fitness == 10){
-		for (j=0; j<size; ++j){
-			chrom->gene[j] = j+1;
-		}		
-		++combinacion;	
-	}
- 	*/
-
     }
 
   else printf("Te eta equivocando chico\n");
